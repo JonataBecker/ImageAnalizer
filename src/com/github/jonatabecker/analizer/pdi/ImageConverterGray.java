@@ -1,22 +1,23 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.github.jonatabecker.analizer.pdi;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 /**
- *
+ * Class responsible for convert a image to gray
+ * 
  * @author JonataBecker
  */
 public class ImageConverterGray {
-    
+
+    /**
+     * Convert a image to gray
+     * 
+     * @param imagem
+     * @return int[][]
+     */
     public int[][] convert(BufferedImage imagem) {
-        int [][] map = new int[imagem.getHeight()][imagem.getWidth()];
-        
+        int [][] map = new int[imagem.getWidth()][imagem.getHeight()];
         for (int x = 0; x < imagem.getWidth(); x++) {
             for (int y = 0; y < imagem.getHeight(); y++) {
                 Color color = new Color(imagem.getRGB(x, y), false);
@@ -28,6 +29,14 @@ public class ImageConverterGray {
         return map;
     }
     
+    /**
+     * Convert a image data to a BufferdImage
+     * 
+     * @param image
+     * @param width
+     * @param height
+     * @return BufferedImage
+     */
     public BufferedImage convertToBuffer(int[][] image, int width, int height) {
         BufferedImage buffer = new BufferedImage(width, height, BufferedImage.OPAQUE);
         for (int x = 0; x < width; x++) {

@@ -3,27 +3,26 @@ package com.github.jonatabecker.analizer.pdi;
 import com.github.jonatabecker.analizer.commons.Image;
 
 /**
- * Class responsible for the histogram process
+ * Class responsible for calculate de average process
  *
  * @author JonataBecker
  */
-public class HistogramProcess extends PixelProcess {
+public class AverageProcess extends PixelProcess {
 
-    /** The histogram information */
-    private final int[] data;
+    /** The sum total */
+    private long total;
 
     /**
-     * Constructor of the histogram process
+     * Constructor of average process
      *
      * @param image Image information
      */
-    public HistogramProcess(Image image) {
+    public AverageProcess(Image image) {
         super(image);
-        data = new int[256];
     }
 
     /**
-     * Execute the pixel process
+     * Execute de pixel process
      *
      * @param pixel Pixel value
      * @param x Coordinate
@@ -31,17 +30,17 @@ public class HistogramProcess extends PixelProcess {
      */
     @Override
     public void process(int x, int y, int pixel) {
-        data[pixel]++;
+        total += pixel;
     }
 
     /**
-     * Return the histogram data.
+     * Return the image average
      *
-     * @return int[] List of 256 positions
+     * @return int
      */
-    public int[] getHistogram() {
+    public int getAverage() {
         process();
-        return data;
+        return (int) total / (getImage().getWidth() * getImage().getHeight());
     }
 
 }
