@@ -6,7 +6,11 @@ import com.github.jonatabecker.analizer.pdi.AverageProcess;
 import com.github.jonatabecker.analizer.pdi.MedianProcess;
 import com.github.jonatabecker.analizer.pdi.ModeProcess;
 import com.github.jonatabecker.analizer.pdi.ProcessImage;
-import com.github.jonatabecker.analizer.pdi.StatisticalAProcess;
+import com.github.jonatabecker.analizer.pdi.StatisticalProcessA;
+import com.github.jonatabecker.analizer.pdi.StatisticalProcessB;
+import com.github.jonatabecker.analizer.pdi.StatisticalProcessC;
+import com.github.jonatabecker.analizer.pdi.StatisticalProcessD;
+import com.github.jonatabecker.analizer.pdi.StatisticalProcessE;
 import com.github.jonatabecker.analizer.pdi.VarianceProcess;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -28,19 +32,12 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
-import static javafx.application.Application.launch;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
 import static javafx.application.Application.launch;
 
 /**
@@ -115,12 +112,25 @@ public class ImageAnalizer extends Application {
         Menu statistics = new Menu("Statistics");
         MenuItem statisticalA = new MenuItem("a) Valores maiores ou iguais a 128 de toda a imagem recebem a média de tonalidades de cinza da imagem.");
         statisticalA.setOnAction((ActionEvent event) -> {
-            executeProcess(new StatisticalAProcess(new Image(reader)));
+            executeProcess(new StatisticalProcessA(new Image(reader)));
         });
         MenuItem statisticalB = new MenuItem("b) Valores maiores ou iguais a 128 de toda a imagem recebem a moda de tonalidades de cinza da imagem.");
+        statisticalB.setOnAction((ActionEvent event) -> {
+            executeProcess(new StatisticalProcessB(new Image(reader)));
+        });
         MenuItem statisticalC = new MenuItem("c) Valores maiores ou iguais a 128 de toda a imagem recebem a mediana de tonalidades de cinza da imagem.");
-        MenuItem statisticalD = new MenuItem("e) Valores maiores que a mediana de toda a imagem recebem branco e menores que a média recebem preto.");
-        statistics.getItems().addAll(statisticalA, statisticalB, statisticalC, statisticalD);
+        statisticalC.setOnAction((ActionEvent event) -> {
+            executeProcess(new StatisticalProcessC(new Image(reader)));
+        });
+        MenuItem statisticalD = new MenuItem("d) Valores menores que a média de toda a imagem recebem preto.");
+        statisticalD.setOnAction((ActionEvent event) -> {
+            executeProcess(new StatisticalProcessD(new Image(reader)));
+        });
+        MenuItem statisticalE = new MenuItem("e) Valores maiores que a mediana de toda a imagem recebem branco e menores que a média recebem preto.");
+        statisticalE.setOnAction((ActionEvent event) -> {
+            executeProcess(new StatisticalProcessE(new Image(reader)));
+        });
+        statistics.getItems().addAll(statisticalA, statisticalB, statisticalC, statisticalD, statisticalE);
         // Add menu itens
         menuBar.getMenus().addAll(file, statistics);
         pane.setTop(menuBar);

@@ -5,11 +5,11 @@ import com.github.jonatabecker.analizer.commons.Image;
 /**
  * Class responsible for a statistic process
  *
- * Set the average pixel value to the pixels with values greater 128
+ * Set the black pixel to pixels with values greater the average
  *
  * @author JonataBecker
  */
-public class StatisticalAProcess extends PixelProcess implements ProcessImage {
+public class StatisticalProcessD extends PixelProcess implements ProcessImage {
 
     /** The average pixel value */
     private final int average;
@@ -19,7 +19,7 @@ public class StatisticalAProcess extends PixelProcess implements ProcessImage {
      *
      * @param image
      */
-    public StatisticalAProcess(Image image) {
+    public StatisticalProcessD(Image image) {
         super(image);
         this.average = new AverageProcess(image).getAverage();
     }
@@ -33,8 +33,8 @@ public class StatisticalAProcess extends PixelProcess implements ProcessImage {
      */
     @Override
     public void process(int x, int y, int pixel) {
-        if (pixel >= 128) {
-            getImage().setPixel(x, y, average);
+        if (pixel > average) {
+            getImage().setPixel(x, y, 0);
         }
     }
 
