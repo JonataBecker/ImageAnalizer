@@ -39,6 +39,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import static javafx.application.Application.launch;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
 /**
  * Class responsible for image view
@@ -101,15 +103,23 @@ public class ImageAnalizer extends Application {
         // Create menu
         MenuBar menuBar = new MenuBar();
         // File menu
-        Menu file = new Menu("File");
-        MenuItem fileOpen = new MenuItem("New");
+        Menu file = new Menu("Arquivo");
+        MenuItem fileOpen = new MenuItem("Novo");
         fileOpen.setOnAction((ActionEvent event) -> {
             FileChooser fileChooser = new FileChooser();
             loadImage(fileChooser.showOpenDialog(null));
         });
         file.getItems().addAll(fileOpen);
         // Statictics
-        Menu statistics = new Menu("Statistics");
+        Menu statistics = new Menu("Estatísticas");
+        MenuItem staticticInfo = new MenuItem("Informações");
+        staticticInfo.setOnAction((ActionEvent event) -> {
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("Informações");
+            alert.setHeaderText(null);
+            alert.setContentText(new Information(new Image(reader)).getInfo());
+            alert.showAndWait();
+        });
         MenuItem statisticalA = new MenuItem("a) Valores maiores ou iguais a 128 de toda a imagem recebem a média de tonalidades de cinza da imagem.");
         statisticalA.setOnAction((ActionEvent event) -> {
             executeProcess(new StatisticalProcessA(new Image(reader)));
@@ -130,7 +140,7 @@ public class ImageAnalizer extends Application {
         statisticalE.setOnAction((ActionEvent event) -> {
             executeProcess(new StatisticalProcessE(new Image(reader)));
         });
-        statistics.getItems().addAll(statisticalA, statisticalB, statisticalC, statisticalD, statisticalE);
+        statistics.getItems().addAll(staticticInfo, statisticalA, statisticalB, statisticalC, statisticalD, statisticalE);
         // Add menu itens
         menuBar.getMenus().addAll(file, statistics);
         pane.setTop(menuBar);
@@ -153,7 +163,7 @@ public class ImageAnalizer extends Application {
         BorderPane boxImageLeftInner = new BorderPane();
         boxImageLeftInner.setCenter(original);
         boxImageLeftInner.setStyle("-fx-background-color:#EEEEEE; -fx-border-color: #CCC; -fx-border:1px;");
-        boxImageLeft.setTop(createTitle("Original Image"));
+        boxImageLeft.setTop(createTitle("Imagem original"));
         boxImageLeft.setCenter(boxImageLeftInner);
         // Create modifyed imagem
         modify = new ImageView();
@@ -164,7 +174,7 @@ public class ImageAnalizer extends Application {
         boxImageRightInner.setCenter(modify);
         boxImageRightInner.setStyle("-fx-background-color:#EEEEEE; -fx-border-color: #CCC; -fx-border:1px;");
         boxImageRightInner.setMaxHeight(490);
-        boxImageRight.setTop(createTitle("Modified image"));
+        boxImageRight.setTop(createTitle("Imagem modificada"));
         boxImageRight.setCenter(boxImageRightInner);
         // Add imagens in the grid
         boxImage.addColumn(0, boxImageLeft);
@@ -212,7 +222,7 @@ public class ImageAnalizer extends Application {
         // Create the average field
         BorderPane averageBox = new BorderPane();
         averageBox.setPadding(new Insets(0, 5, 10, 0));
-        Label averageLabel = new Label("Average:");
+        Label averageLabel = new Label("Média:");
         textAverage = new TextField();
         textAverage.setDisable(true);
         averageBox.setTop(averageLabel);
@@ -221,7 +231,7 @@ public class ImageAnalizer extends Application {
         // Create the median field
         BorderPane medianBox = new BorderPane();
         medianBox.setPadding(new Insets(0, 0, 10, 5));
-        Label mediaLabel = new Label("Median:");
+        Label mediaLabel = new Label("Mediana:");
         textMedian = new TextField();
         textMedian.setDisable(true);
         medianBox.setTop(mediaLabel);
@@ -230,7 +240,7 @@ public class ImageAnalizer extends Application {
         // Create the mode field
         BorderPane modeBox = new BorderPane();
         modeBox.setPadding(new Insets(0, 5, 0, 0));
-        Label modeLabel = new Label("Mode:");
+        Label modeLabel = new Label("Moda:");
         textMode = new TextField();
         textMode.setDisable(true);
         modeBox.setTop(modeLabel);
@@ -239,7 +249,7 @@ public class ImageAnalizer extends Application {
         // Create the variance field
         BorderPane varianceBox = new BorderPane();
         varianceBox.setPadding(new Insets(0, 0, 0, 5));
-        Label varianceLabel = new Label("Variance:");
+        Label varianceLabel = new Label("Variância:");
         textVariance = new TextField();
         textVariance.setDisable(true);
         varianceBox.setTop(varianceLabel);
@@ -308,16 +318,16 @@ public class ImageAnalizer extends Application {
         label.setPadding(new Insets(0, 0, 5, 0));
         return label;
     }
-    
+
     /**
      * Execute a image process
-     * 
+     *
      * @param process
      */
     private void executeProcess(ProcessImage process) {
-        modify.setImage(SwingFXUtils.toFXImage(process.execute().getBufferdImage(), null)); 
+        modify.setImage(SwingFXUtils.toFXImage(process.execute().getBufferdImage(), null));
     }
-    
+
     public static void main(String[] args) {
         launch(args);
     }
