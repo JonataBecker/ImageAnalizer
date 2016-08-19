@@ -17,7 +17,7 @@ public class ImageConverterGray {
      * @return int[][]
      */
     public int[][] convert(BufferedImage imagem) {
-        int [][] map = new int[imagem.getWidth()][imagem.getHeight()];
+        int[][] map = new int[imagem.getWidth()][imagem.getHeight()];
         for (int x = 0; x < imagem.getWidth(); x++) {
             for (int y = 0; y < imagem.getHeight(); y++) {
                 Color color = new Color(imagem.getRGB(x, y), false);

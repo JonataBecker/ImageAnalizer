@@ -30,14 +30,14 @@ public class Information {
      * @return int
      */
     private int getAverage() {
-        int max = image.getWidth() / 2;
+        int ini = image.getWidth() / 2;
         int total = 0;
-        for (int x = 0; x < max; x++) {
+        for (int x = ini; x < image.getWidth(); x++) {
             for (int y = 0; y < image.getHeight(); y++) {
                 total += image.getPixel(x, y);
             }
         }
-        return total / (max * image.getHeight());
+        return total / (ini * image.getHeight());
     }
 
     /**
@@ -46,9 +46,9 @@ public class Information {
      * @return int
      */
     private int getMedian() {
-        int ini = image.getWidth() / 2;
+        int max = image.getWidth() / 2;
         List<Integer> pixels = new ArrayList<>();
-        for (int x = ini; x < image.getWidth(); x++) {
+        for (int x = 0; x < max; x++) {
             for (int y = 0; y < image.getHeight(); y++) {
                 pixels.add(image.getPixel(x, y));
             }
