@@ -230,16 +230,12 @@ public class ImageAnalizer extends Application {
         boxImage.getColumnConstraints().addAll(comConstraints, comConstraints);
         // Create original image
         original = new ImageView();
-        original.setFitHeight(485);
+        original.setFitHeight(465);
         original.setFitWidth(620);
         original.setPreserveRatio(true);
-      
-        
         BorderPane boxImageLeft = new BorderPane();
         boxImageLeft.setPadding(new Insets(10));
         BorderPane boxImageLeftInner = new BorderPane();
-//        boxImageLeftInner.maxHeight(500);
-        
         boxImageLeftInner.setCenter(original);
         boxImageLeftInner.setStyle("-fx-background-color:#EEEEEE; -fx-border-color: #CCC; -fx-border:1px;");
         ToggleButton button = new ToggleButton("WebCam");
@@ -257,16 +253,15 @@ public class ImageAnalizer extends Application {
         boxImageLeft.setCenter(boxImageLeftInner);
         // Create modifyed imagem
         modify = new ImageView();        
-        modify.setFitHeight(485);
+        modify.setFitHeight(465);
         modify.setFitWidth(620);
         modify.setPreserveRatio(true);
         BorderPane boxImageRight = new BorderPane();
-        boxImageRight.setPrefHeight(485);
+        boxImageRight.setPrefHeight(465);
         boxImageRight.setPadding(new Insets(10));
         BorderPane boxImageRightInner = new BorderPane();
         boxImageRightInner.setCenter(modify);
         boxImageRightInner.setStyle("-fx-background-color:#EEEEEE; -fx-border-color: #CCC; -fx-border:1px;");
-        boxImageRightInner.setMaxHeight(485);
         boxImageRight.setTop(createTitle("Imagem modificada"));
         boxImageRight.setCenter(boxImageRightInner);
         // Add imagens in the grid

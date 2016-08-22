@@ -64,8 +64,8 @@ public class Information {
      */
     private int getMode() {
         int[] histogram = new int[256];
-        for (int x = 0; x < image.getWidth(); x++) {
-            for (int y = x; y < image.getHeight(); y++) {
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = y; x < image.getWidth(); x++) {
                 histogram[image.getPixel(x, y)]++;
             }
         }
@@ -88,16 +88,16 @@ public class Information {
     private int getVariance() {
         int totalAverage = 0;
         int num = 0;
-        for (int y = 0; y < image.getHeight(); y++) {
-            for (int x = y; x < image.getWidth(); x++) {
+        for (int x = 0; x < image.getWidth(); x++) {
+            for (int y = x; y < image.getHeight(); y++) {
                 totalAverage += image.getPixel(x, y);
                 num++;
             }
         }
         int average = totalAverage / num;
         int total = 0;
-        for (int y = 0; y < image.getHeight(); y++) {
-            for (int x = y; x < image.getWidth(); x++) {
+        for (int x = 0; x < image.getWidth(); x++) {
+            for (int y = x; y < image.getHeight(); y++) {
                 total += Math.pow(image.getPixel(x, y) - average, 2);
             }
         }
