@@ -1,3 +1,4 @@
+
 package com.github.jonatabecker.analizer.pdi;
 
 import com.github.jonatabecker.analizer.commons.Image;
@@ -33,7 +34,7 @@ public class StatisticalProcessD extends PixelProcess implements ProcessImage {
      */
     @Override
     public void process(int x, int y, int pixel) {
-        if (pixel > average) {
+        if (pixel < average) {
             getImage().setPixel(x, y, 0);
         }
     }
