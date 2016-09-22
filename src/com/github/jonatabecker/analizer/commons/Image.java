@@ -31,6 +31,13 @@ public class Image {
         this.data = convertImage(imagem);
     }
 
+    public Image(int width, int height) {
+        this.width = width;
+        this.height = height;
+        this.data = new int[height][width];
+        this.grayConverter = new ImageConverterGray();
+    }
+    
     /**
      * Execute conversion to gray
      *

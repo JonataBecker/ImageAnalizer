@@ -3,20 +3,31 @@ package com.github.jonatabecker.analizer;
 import com.github.jonatabecker.analizer.pdi.HistogramProcess;
 import com.github.jonatabecker.analizer.commons.Image;
 import com.github.jonatabecker.analizer.pdi.AverageProcess;
+import com.github.jonatabecker.analizer.pdi.EnlargmentProcess;
+import com.github.jonatabecker.analizer.pdi.FreeProcess;
 import com.github.jonatabecker.analizer.pdi.MedianProcess;
+import com.github.jonatabecker.analizer.pdi.MirrorHorizonProcess;
+import com.github.jonatabecker.analizer.pdi.MirrorVeriticalProcess;
 import com.github.jonatabecker.analizer.pdi.ModeProcess;
 import com.github.jonatabecker.analizer.pdi.ProcessImage;
+import com.github.jonatabecker.analizer.pdi.ReductionProcess;
+import com.github.jonatabecker.analizer.pdi.RotationProcess;
 import com.github.jonatabecker.analizer.pdi.StatisticalProcessA;
 import com.github.jonatabecker.analizer.pdi.StatisticalProcessB;
 import com.github.jonatabecker.analizer.pdi.StatisticalProcessC;
 import com.github.jonatabecker.analizer.pdi.StatisticalProcessD;
 import com.github.jonatabecker.analizer.pdi.StatisticalProcessE;
+import com.github.jonatabecker.analizer.pdi.TranslationProcess;
 import com.github.jonatabecker.analizer.pdi.VarianceProcess;
 import com.github.sarxos.webcam.Webcam;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import javafx.application.Application;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
@@ -45,7 +56,12 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToggleButton;
+import javafx.util.Pair;
 
 /**
  * Class responsible for image view
@@ -67,6 +83,7 @@ public class ImageAnalizer extends Application {
     private boolean stopCamera = true;
     private Webcam webCam;
     private Class lastProcess;
+    private Object[] lastParameters;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -144,7 +161,7 @@ public class ImageAnalizer extends Application {
                             Image image = new Image(reader);
                             original.setImage(SwingFXUtils.toFXImage(reader, null));
                             laodStatistics(image);
-                            executeProcess(lastProcess, image);
+                            executeProcess(lastProcess, image, lastParameters);
                         }
                     } catch (Exception e) {
                     }
@@ -213,9 +230,153 @@ public class ImageAnalizer extends Application {
             executeProcessImage(StatisticalProcessE.class, new Image(reader));
         });
         statistics.getItems().addAll(staticticInfo, statisticalA, statisticalB, statisticalC, statisticalD, statisticalE);
+        // Transformation
+        Menu transformation = new Menu("Transformações");
+        MenuItem transformationTranslation = new MenuItem("Translação");
+        transformationTranslation.setOnAction((ActionEvent event) -> {
+            executeTranslation();
+        });
+        MenuItem transformationRotation = new MenuItem("Rotação");
+        transformationRotation.setOnAction((ActionEvent event) -> {
+            executeRotation();
+        });
+        MenuItem transformationEnlargment = new MenuItem("Ampliação");
+        transformationEnlargment.setOnAction((ActionEvent event) -> {
+            executeEnlargment();
+        });
+        MenuItem transformationReduction = new MenuItem("Redução");
+        transformationReduction.setOnAction((ActionEvent event) -> {
+            executeReduction();
+        });
+        Menu transformationMirror = new Menu("Espelhamento");
+        MenuItem transformationMirrorHor = new MenuItem("Horizontal");
+        transformationMirrorHor.setOnAction((ActionEvent event) -> {
+            executeProcessImage(MirrorHorizonProcess.class, new Image(reader));
+        });
+        MenuItem transformationMirrorVer = new MenuItem("Vertical");
+        transformationMirrorVer.setOnAction((ActionEvent event) -> {
+            executeProcessImage(MirrorVeriticalProcess.class, new Image(reader));
+        });
+        transformationMirror.getItems().addAll(transformationMirrorHor, transformationMirrorVer);
+        MenuItem transformationFree = new MenuItem("Livre");
+        transformationFree.setOnAction((ActionEvent event) -> {
+            executeFree();
+        });
+        transformation.getItems().addAll(transformationTranslation, transformationRotation, transformationEnlargment,
+                transformationReduction, transformationMirror, transformationFree);
         // Add menu itens
-        menuBar.getMenus().addAll(file, statistics);
+        menuBar.getMenus().addAll(file, statistics, transformation);
         pane.setTop(menuBar);
+    }
+
+    /**
+     * Execute the translation process
+     */
+    private void executeTranslation() {
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Translação");
+        // Set the button types.
+        ButtonType buttonOk = new ButtonType("Ok", ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(buttonOk, ButtonType.CANCEL);
+        // Create the labels and fields.
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+        TextField x = new TextField();
+        TextField y = new TextField();
+        grid.add(new Label("x:"), 0, 0);
+        grid.add(x, 1, 0);
+        grid.add(new Label("y:"), 0, 1);
+        grid.add(y, 1, 1);
+        dialog.getDialogPane().setContent(grid);
+        // Request focus
+        Platform.runLater(() -> x.requestFocus());
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == buttonOk) {
+                return new Pair<>(x.getText(), y.getText());
+            }
+            return null;
+        });
+        Optional<Pair<String, String>> result = dialog.showAndWait();
+        result.ifPresent(tranlation -> {
+            Integer posX = Integer.valueOf(tranlation.getKey());
+            Integer posY = Integer.valueOf(tranlation.getValue());
+            executeProcessImage(TranslationProcess.class, new Image(reader), posX, posY);
+        });
+    }
+
+    /**
+     * Execute the rotation process
+     */
+    private void executeRotation() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setContentText("Ângulo:");
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(name -> executeProcessImage(RotationProcess.class, new Image(reader), Integer.valueOf(name)));
+    }
+
+    /**
+     * Execute tje enlargment process
+     */
+    private void executeEnlargment() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setContentText("Tamanho:");
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(name -> executeProcessImage(EnlargmentProcess.class, new Image(reader), Double.valueOf(name)));
+    }
+
+    /**
+     * Execute the reduction process
+     */
+    private void executeReduction() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setContentText("Tamanho:");
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(name -> executeProcessImage(ReductionProcess.class, new Image(reader), Double.valueOf(name)));
+    }
+
+    /**
+     * Execute the free transformation
+     */
+    private void executeFree() {
+        Dialog<Double[]> dialog = new Dialog<>();
+        dialog.setTitle("Livre");
+        // Set the button types.
+        ButtonType buttonOk = new ButtonType("Ok", ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(buttonOk, ButtonType.CANCEL);
+        // Create the labels and fields.
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        TextField[][] emls = new TextField[3][3];
+        grid.setPadding(new Insets(20, 150, 10, 10));
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
+                TextField eml = new TextField();
+                eml.setText("0");
+                emls[x][y] = eml;
+                grid.add(eml, x, y);
+            }
+        }
+        dialog.getDialogPane().setContent(grid);
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == buttonOk) {
+                Double[] values = new Double[9];
+                int c = 0;
+                for (int x = 0; x < 3; x++) {
+                    for (int y = 0; y < 3; y++) {
+                        values[c++] = Double.valueOf(emls[x][y].getText());
+                    }
+                }
+                return values;
+            }
+            return null;
+        });
+        Optional<Double[]> result = dialog.showAndWait();
+        result.ifPresent(tranlation -> {
+            executeProcessImage(FreeProcess.class, new Image(reader), tranlation);
+        });
     }
 
     /**
@@ -252,7 +413,7 @@ public class ImageAnalizer extends Application {
         boxImageLeft.setTop(titleOriginal);
         boxImageLeft.setCenter(boxImageLeftInner);
         // Create modifyed imagem
-        modify = new ImageView();        
+        modify = new ImageView();
         modify.setFitHeight(465);
         modify.setFitWidth(620);
         modify.setPreserveRatio(true);
@@ -415,11 +576,13 @@ public class ImageAnalizer extends Application {
      * Execute a image process
      *
      * @param process
+     * @param param
      */
-    private void executeProcessImage(Class process, Image image) {
+    private void executeProcessImage(Class process, Image image, Object... param) {
         lastProcess = process;
+        lastParameters = param;
         if (stopCamera) {
-            executeProcess(process, image);
+            executeProcess(process, image, param);
         }
     }
 
@@ -427,18 +590,32 @@ public class ImageAnalizer extends Application {
      * Execute a image process
      *
      * @param process
+     * @param param
      */
-    private void executeProcess(Class process, Image image) {
+    private void executeProcess(Class process, Image image, Object... param) {
         try {
             BufferedImage buff;
             if (process != null) {
-                ProcessImage proc = (ProcessImage) process.getConstructor(Image.class).newInstance(image);
+                List<Class> list = new ArrayList<>();
+                list.add(Image.class);
+                if (param != null) {
+                    for (Object p : param) {
+                        list.add(p.getClass());
+                    }
+                }
+                Class[] t = list.toArray(new Class[list.size()]);
+                List<Object> values = new ArrayList<>();
+                values.add(image);
+                Collections.addAll(values, param);
+                Object[] val = values.toArray(new Object[values.size()]);
+                ProcessImage proc = (ProcessImage) process.getConstructor(t).newInstance(val);
                 buff = proc.execute().getBufferdImage();
             } else {
                 buff = image.getBufferdImage();
             }
             modify.setImage(SwingFXUtils.toFXImage(buff, null));
         } catch (ReflectiveOperationException e) {
+            System.out.println(e);
         }
     }
 
