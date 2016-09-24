@@ -8,15 +8,15 @@ import com.github.jonatabecker.analizer.commons.Image;
  * @author JonataBecker
  */
 public class TransformationProcess extends PixelProcess implements ProcessImage {
-    
+
     /** Image */
     private final Image img;
     /** Transformation information */
     private final double[][] mat;
-    
+
     /**
      * Construtor of transformations process
-     * 
+     *
      * @param image Imagem
      * @param mat Transformation information
      */
@@ -28,19 +28,21 @@ public class TransformationProcess extends PixelProcess implements ProcessImage 
 
     /**
      * Execute de process
-     * 
+     *
      * @param x Position x
      * @param y Position Y
      * @param pixel Pixel value
      */
     @Override
     public void process(int x, int y, int pixel) {
-        int newX = x + 1;
-        int newY = y + 1;
-        newX = (int) ((double) (newX) * mat[0][0] + (double) (newY) * mat[1][0] + (double) 1 * mat[2][0]);
-        newY = (int) ((double) (newX) * mat[0][1] + (double) (newY) * mat[1][1] + (double) 1 * mat[2][1]);
-        newX = newX >= 0 ? newX - 1 : getImage().getWidth() + newX;
-        newY = newY >= 0 ? newY - 1 : getImage().getHeight() + newY;
+        int halfX = getImage().getWidth() / 2;
+        int halfY = getImage().getHeight()/ 2;
+        int tmpX = x - halfX;
+        int tmpY = y - halfY;
+        int newX = (int) Math.round(tmpX * mat[0][0] + tmpY * mat[0][1] + 1 * mat[0][2]);
+        int newY = (int) Math.round(tmpX * mat[1][0] + tmpY * mat[1][1] + 1 * mat[1][2]);
+        newX += halfX;
+        newY += halfY;
         // Pixel position is right
         if (newX < getImage().getWidth() && newY < getImage().getHeight() && newX >= 0 && newY >= 0) {
             img.setPixel(newX, newY, pixel);
@@ -49,7 +51,7 @@ public class TransformationProcess extends PixelProcess implements ProcessImage 
 
     /**
      * Execute the transformation process
-     * 
+     *
      * @return Image
      */
     @Override

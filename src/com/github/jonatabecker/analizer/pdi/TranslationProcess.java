@@ -17,9 +17,9 @@ public class TranslationProcess extends TransformationProcess {
      * @param y Translation Y
      */
     public TranslationProcess(Image image, Integer x, Integer y) {
-        super(image, new double[][]{{1, 0, 0},
-        {0, 1, 0},
-        {x, y, 1}});
+        super(image, new double[][]{{1, 0, x},
+        {0, 1, y},
+        {0, 0, 1}});
     }
 
 }
