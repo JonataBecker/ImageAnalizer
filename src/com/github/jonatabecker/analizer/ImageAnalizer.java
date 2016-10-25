@@ -5,6 +5,8 @@ import com.github.jonatabecker.analizer.commons.Image;
 import com.github.jonatabecker.analizer.pdi.AverageProcess;
 import com.github.jonatabecker.analizer.pdi.EnlargmentProcess;
 import com.github.jonatabecker.analizer.pdi.FreeProcess;
+import com.github.jonatabecker.analizer.pdi.GaussProcess;
+import com.github.jonatabecker.analizer.pdi.MedianFilterProcess;
 import com.github.jonatabecker.analizer.pdi.MedianProcess;
 import com.github.jonatabecker.analizer.pdi.MirrorHorizonProcess;
 import com.github.jonatabecker.analizer.pdi.MirrorVeriticalProcess;
@@ -264,8 +266,21 @@ public class ImageAnalizer extends Application {
         });
         transformation.getItems().addAll(transformationTranslation, transformationRotation, transformationEnlargment,
                 transformationReduction, transformationMirror, transformationFree);
+        // Filtros
+        Menu filtro = new Menu("Filtros");
+        MenuItem filtroMedian = new MenuItem("Mediana");
+        filtroMedian.setOnAction((ActionEvent event) -> {
+            executeProcessImage(MedianFilterProcess.class, new Image(reader));
+        });
+        MenuItem filtroGaus = new MenuItem("Gauss");
+        filtroGaus.setOnAction((ActionEvent event) -> {
+            executeProcessImage(GaussProcess.class, new Image(reader));
+        });
+        MenuItem filtroLimirializacao = new MenuItem("Limirialização");
+        MenuItem filtroDeteccaoBordas = new MenuItem("Detecção de bordas");
+        filtro.getItems().addAll(filtroMedian, filtroGaus, filtroLimirializacao, filtroDeteccaoBordas);
         // Add menu itens
-        menuBar.getMenus().addAll(file, statistics, transformation);
+        menuBar.getMenus().addAll(file, statistics, transformation, filtro);
         pane.setTop(menuBar);
     }
 
@@ -375,7 +390,7 @@ public class ImageAnalizer extends Application {
         });
         Optional<Double[]> result = dialog.showAndWait();
         result.ifPresent(tranlation -> {
-            executeProcessImage(FreeProcess.class, new Image(reader), tranlation);
+            executeProcessImage(FreeProcess.class, new Image(reader), (Object []) tranlation);
         });
     }
 
