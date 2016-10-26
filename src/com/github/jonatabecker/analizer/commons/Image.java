@@ -34,10 +34,10 @@ public class Image {
     public Image(int width, int height) {
         this.width = width;
         this.height = height;
-        this.data = new int[height][width];
+        this.data = new int[width][height];
         this.grayConverter = new ImageConverterGray();
     }
-    
+
     /**
      * Execute conversion to gray
      *
@@ -94,7 +94,9 @@ public class Image {
      * @param pixel
      */
     public void setPixel(int x, int y, int pixel) {
-        data[x][y] = pixel;
+        if (width > x && height > y) {
+            data[x][y] = pixel;
+        }
     }
 
 }

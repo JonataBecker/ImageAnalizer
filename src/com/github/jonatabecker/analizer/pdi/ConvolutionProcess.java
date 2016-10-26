@@ -13,10 +13,14 @@ public abstract class ConvolutionProcess extends ImageProcess implements Process
     private final Image img;
 
     public ConvolutionProcess(Image image) {
-        super(image);
-        this.img = new Image(image.getBufferdImage());
+        this(image, new Image(image.getBufferdImage()));
     }
-
+    
+    public ConvolutionProcess(Image image, Image img) {
+        super(image);
+        this.img = img;
+    }
+    
     /**
      * Process the image
      */
@@ -68,7 +72,6 @@ public abstract class ConvolutionProcess extends ImageProcess implements Process
     public Image execute() {
         process();
         return img;
-
     }
 
 }

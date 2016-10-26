@@ -14,11 +14,13 @@ import com.github.jonatabecker.analizer.pdi.ModeProcess;
 import com.github.jonatabecker.analizer.pdi.ProcessImage;
 import com.github.jonatabecker.analizer.pdi.ReductionProcess;
 import com.github.jonatabecker.analizer.pdi.RotationProcess;
+import com.github.jonatabecker.analizer.pdi.SobelProcess;
 import com.github.jonatabecker.analizer.pdi.StatisticalProcessA;
 import com.github.jonatabecker.analizer.pdi.StatisticalProcessB;
 import com.github.jonatabecker.analizer.pdi.StatisticalProcessC;
 import com.github.jonatabecker.analizer.pdi.StatisticalProcessD;
 import com.github.jonatabecker.analizer.pdi.StatisticalProcessE;
+import com.github.jonatabecker.analizer.pdi.ThresholdProcess;
 import com.github.jonatabecker.analizer.pdi.TranslationProcess;
 import com.github.jonatabecker.analizer.pdi.VarianceProcess;
 import com.github.sarxos.webcam.Webcam;
@@ -86,9 +88,11 @@ public class ImageAnalizer extends Application {
     private Webcam webCam;
     private Class lastProcess;
     private Object[] lastParameters;
+    private Stage stage;
 
     @Override
     public void start(Stage stage) throws Exception {
+        this.stage = stage;
         initComponents();
         stage.setMaximized(true);
         stage.setScene(new Scene(pane));
@@ -161,11 +165,14 @@ public class ImageAnalizer extends Application {
                         if (tmp != null) {
                             reader = tmp;
                             Image image = new Image(reader);
-                            original.setImage(SwingFXUtils.toFXImage(reader, null));
+                            Platform.runLater(() -> {
+                                original.setImage(SwingFXUtils.toFXImage(reader, null));
+                            });
                             laodStatistics(image);
                             executeProcess(lastProcess, image, lastParameters);
                         }
                     } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
                 return null;
@@ -277,7 +284,14 @@ public class ImageAnalizer extends Application {
             executeProcessImage(GaussProcess.class, new Image(reader));
         });
         MenuItem filtroLimirializacao = new MenuItem("Limirialização");
+        filtroLimirializacao.setOnAction((ActionEvent event) -> {
+            executeThreshold();
+        });
         MenuItem filtroDeteccaoBordas = new MenuItem("Detecção de bordas");
+        filtroDeteccaoBordas.setOnAction((ActionEvent event) -> {
+            executeDeteccao();
+        });
+
         filtro.getItems().addAll(filtroMedian, filtroGaus, filtroLimirializacao, filtroDeteccaoBordas);
         // Add menu itens
         menuBar.getMenus().addAll(file, statistics, transformation, filtro);
@@ -390,8 +404,40 @@ public class ImageAnalizer extends Application {
         });
         Optional<Double[]> result = dialog.showAndWait();
         result.ifPresent(tranlation -> {
-            executeProcessImage(FreeProcess.class, new Image(reader), (Object []) tranlation);
+            executeProcessImage(FreeProcess.class, new Image(reader), (Object[]) tranlation);
         });
+    }
+
+    /**
+     * Execute the threshold process
+     */
+    private void executeThreshold() {
+        Threshold th = new Threshold();
+        th.addObserver((threshold) -> {
+            executeProcessImage(ThresholdProcess.class, new Image(reader), threshold);
+        });
+        th.setValue(150);
+        Dialog<Double[]> dialog = new Dialog<>();
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+        dialog.setTitle("Thresholding");
+        dialog.getDialogPane().setContent(th);
+        dialog.show();
+    }
+
+    /**
+     * Execute the border detection process
+     */
+    private void executeDeteccao() {
+        Threshold th = new Threshold();
+        th.addObserver((threshold) -> {
+            executeProcessImage(SobelProcess.class, new Image(reader), threshold);
+        });
+        th.setValue(200);
+        Dialog<Double[]> dialog = new Dialog<>();
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+        dialog.setTitle("Detecção de bordas");
+        dialog.getDialogPane().setContent(th);
+        dialog.show();
     }
 
     /**
@@ -628,7 +674,9 @@ public class ImageAnalizer extends Application {
             } else {
                 buff = image.getBufferdImage();
             }
-            modify.setImage(SwingFXUtils.toFXImage(buff, null));
+            Platform.runLater(() -> {
+                modify.setImage(SwingFXUtils.toFXImage(buff, null));
+            });
         } catch (ReflectiveOperationException e) {
             System.out.println(e);
         }
