@@ -94,7 +94,7 @@ public class Image {
      * @param pixel
      */
     public void setPixel(int x, int y, int pixel) {
-        if (width > x && height > y) {
+        if (width > x && height > y && pixel <= 255) {
             data[x][y] = pixel;
         }
     }

@@ -3,7 +3,9 @@ package com.github.jonatabecker.analizer;
 import com.github.jonatabecker.analizer.pdi.HistogramProcess;
 import com.github.jonatabecker.analizer.commons.Image;
 import com.github.jonatabecker.analizer.pdi.AverageProcess;
+import com.github.jonatabecker.analizer.pdi.DilationProcess;
 import com.github.jonatabecker.analizer.pdi.EnlargmentProcess;
+import com.github.jonatabecker.analizer.pdi.ErosionProcess;
 import com.github.jonatabecker.analizer.pdi.FreeProcess;
 import com.github.jonatabecker.analizer.pdi.GaussProcess;
 import com.github.jonatabecker.analizer.pdi.MedianFilterProcess;
@@ -291,10 +293,23 @@ public class ImageAnalizer extends Application {
         filtroDeteccaoBordas.setOnAction((ActionEvent event) -> {
             executeDeteccao();
         });
-
-        filtro.getItems().addAll(filtroMedian, filtroGaus, filtroLimirializacao, filtroDeteccaoBordas);
+        // Morfologia 
+        Menu morfologia = new Menu("Morfologia");
+        MenuItem morfologiaDilatacao = new MenuItem("Dilatação");
+        morfologiaDilatacao.setOnAction((ActionEvent event) -> {
+            executeProcessImage(DilationProcess.class, new Image(reader));
+        });
+        MenuItem morfologiaErosao = new MenuItem("Erosão");
+        morfologiaErosao.setOnAction((ActionEvent event) -> {
+            executeProcessImage(ErosionProcess.class, new Image(reader));
+        });
+        MenuItem morfologiaAbertura = new MenuItem("Abertura");
+        MenuItem morfologiaFechamento = new MenuItem("Fechamento");
+        MenuItem morfologiaAfinamento = new MenuItem("Afinamento");
+        morfologia.getItems().addAll(morfologiaDilatacao, morfologiaErosao, morfologiaAbertura, morfologiaFechamento,
+                morfologiaAfinamento);
         // Add menu itens
-        menuBar.getMenus().addAll(file, statistics, transformation, filtro);
+        menuBar.getMenus().addAll(file, statistics, transformation, filtro, morfologia);
         pane.setTop(menuBar);
     }
 
@@ -602,10 +617,12 @@ public class ImageAnalizer extends Application {
         int variace = new VarianceProcess(imagem, average).getVariance();
         int mode = new ModeProcess(imagem, histogram).getMode();
         loadHistogramer(histogram);
-        textAverage.setText(String.valueOf(average));
-        textMedian.setText(String.valueOf(median));
-        textVariance.setText(String.valueOf(variace));
-        textMode.setText(String.valueOf(mode));
+        Platform.runLater(() -> {
+            textAverage.setText(String.valueOf(average));
+            textMedian.setText(String.valueOf(median));
+            textVariance.setText(String.valueOf(variace));
+            textMode.setText(String.valueOf(mode));
+        });
     }
 
     /**
