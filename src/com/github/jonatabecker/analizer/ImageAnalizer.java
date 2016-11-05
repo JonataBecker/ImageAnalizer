@@ -2,12 +2,15 @@ package com.github.jonatabecker.analizer;
 
 import com.github.jonatabecker.analizer.pdi.HistogramProcess;
 import com.github.jonatabecker.analizer.commons.Image;
+import com.github.jonatabecker.analizer.pdi.AberturaProcess;
 import com.github.jonatabecker.analizer.pdi.AverageProcess;
 import com.github.jonatabecker.analizer.pdi.DilationProcess;
 import com.github.jonatabecker.analizer.pdi.EnlargmentProcess;
 import com.github.jonatabecker.analizer.pdi.ErosionProcess;
+import com.github.jonatabecker.analizer.pdi.FechamentoProcess;
 import com.github.jonatabecker.analizer.pdi.FreeProcess;
 import com.github.jonatabecker.analizer.pdi.GaussProcess;
+import com.github.jonatabecker.analizer.pdi.HeltProcess;
 import com.github.jonatabecker.analizer.pdi.MedianFilterProcess;
 import com.github.jonatabecker.analizer.pdi.MedianProcess;
 import com.github.jonatabecker.analizer.pdi.MirrorHorizonProcess;
@@ -304,8 +307,17 @@ public class ImageAnalizer extends Application {
             executeProcessImage(ErosionProcess.class, new Image(reader));
         });
         MenuItem morfologiaAbertura = new MenuItem("Abertura");
+        morfologiaAbertura.setOnAction((ActionEvent event) -> {
+            executeProcessImage(AberturaProcess.class, new Image(reader));
+        });
         MenuItem morfologiaFechamento = new MenuItem("Fechamento");
+        morfologiaFechamento.setOnAction((ActionEvent event) -> {
+            executeProcessImage(FechamentoProcess.class, new Image(reader));
+        });
         MenuItem morfologiaAfinamento = new MenuItem("Afinamento");
+        morfologiaAfinamento.setOnAction((ActionEvent event) -> {
+            executeProcessImage(HeltProcess.class, new ThresholdProcess(new Image(reader), 150).execute());
+        });
         morfologia.getItems().addAll(morfologiaDilatacao, morfologiaErosao, morfologiaAbertura, morfologiaFechamento,
                 morfologiaAfinamento);
         // Add menu itens

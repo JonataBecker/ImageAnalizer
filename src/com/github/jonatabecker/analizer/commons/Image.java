@@ -30,6 +30,23 @@ public class Image {
         this.grayConverter = new ImageConverterGray();
         this.data = convertImage(imagem);
     }
+ 
+    /**
+     * Image information contruction
+     *
+     * @param imagem
+     */
+    public Image(Image imagem) {
+        this.width = imagem.getWidth();
+        this.height = imagem.getHeight();
+        this.grayConverter = new ImageConverterGray();
+        this.data = new int[width][height];
+         for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                data[x][y] = imagem.data[x][y];
+            }
+        }
+    }
 
     public Image(int width, int height) {
         this.width = width;
