@@ -10,7 +10,7 @@ import com.github.jonatabecker.analizer.pdi.ErosionProcess;
 import com.github.jonatabecker.analizer.pdi.FechamentoProcess;
 import com.github.jonatabecker.analizer.pdi.FreeProcess;
 import com.github.jonatabecker.analizer.pdi.GaussProcess;
-import com.github.jonatabecker.analizer.pdi.HeltProcess;
+import com.github.jonatabecker.analizer.pdi.AfinamentoProcess;
 import com.github.jonatabecker.analizer.pdi.MedianFilterProcess;
 import com.github.jonatabecker.analizer.pdi.MedianProcess;
 import com.github.jonatabecker.analizer.pdi.MirrorHorizonProcess;
@@ -296,6 +296,7 @@ public class ImageAnalizer extends Application {
         filtroDeteccaoBordas.setOnAction((ActionEvent event) -> {
             executeDeteccao();
         });
+        filtro.getItems().addAll(filtroMedian, filtroGaus, filtroLimirializacao, filtroDeteccaoBordas);
         // Morfologia 
         Menu morfologia = new Menu("Morfologia");
         MenuItem morfologiaDilatacao = new MenuItem("Dilatação");
@@ -316,7 +317,7 @@ public class ImageAnalizer extends Application {
         });
         MenuItem morfologiaAfinamento = new MenuItem("Afinamento");
         morfologiaAfinamento.setOnAction((ActionEvent event) -> {
-            executeProcessImage(HeltProcess.class, new ThresholdProcess(new Image(reader), 150).execute());
+            executeProcessImage(AfinamentoProcess.class, new ThresholdProcess(new Image(reader), 150).execute());
         });
         morfologia.getItems().addAll(morfologiaDilatacao, morfologiaErosao, morfologiaAbertura, morfologiaFechamento,
                 morfologiaAfinamento);

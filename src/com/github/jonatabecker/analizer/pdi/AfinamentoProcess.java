@@ -7,12 +7,12 @@ import com.github.jonatabecker.analizer.commons.Image;
  *
  * @author JonataBecker
  */
-public class HeltProcess implements ProcessImage {
+public class AfinamentoProcess implements ProcessImage {
 
     private Image image;
     private final Image img;
 
-    public HeltProcess(Image image) {
+    public AfinamentoProcess(Image image) {
         this.image = image;
         this.img = new Image(image);
     }
@@ -35,46 +35,44 @@ public class HeltProcess implements ProcessImage {
                 + (p7 < p8 ? 1 : 0)
                 + (p8 < p9 ? 1 : 0)
                 + (p9 < p2 ? 1 : 0);
-
-        if (
-                (np >= 2 || np <= 6) && sp == 1 && 
-                (
-                    ((p2 + p4 + p6 >= 1) && (p4 + p6 + p8 >= 1))
-//                    ((p2 + p4 + p6 >= 1) && (p4 + p6 + p8 >= 1)) &&
-//                    ((p8 + p2 + p4 >= 1) && (p2 + p8 + p6 >= 1))
-                
-                )
-                ){
-            return 0;
+        if ((np >= 2 && np <= 6) && sp == 1) {
+            if (first) {
+                if ((p2 * p4 * p6 == 0) && (p4 * p6 * p8 == 0)) {
+                    return 0;
+                }
+            } else {
+                if ((p8 * p2 * p4 == 0) && (p2 * p8 * p6 == 0)) {
+                    return 0;
+                }
+            }
         }
         return pixels[1][1];
     }
 
     public void process() {
         boolean mudou = true;
+        boolean firstStep = false;
         while (mudou) {
             mudou = false;
-            for (int z = 0; z < 2; z++) {
-
-                for (int x = 1; x < image.getWidth() - 1; x++) {
-                    for (int y = 1; y < image.getHeight() - 1; y++) {
-//                        if (image.getPixel(x, y) == 255) {
-                            int[][] pixels = new int[3][3];
-                            for (int x2 = 0; x2 < 3; x2++) {
-                                for (int y2 = 0; y2 < 3; y2++) {
-                                    pixels[x2][y2] = image.getPixel(x + x2 - 1, y + y2 - 1);
-                                }
+            firstStep = !firstStep;
+            for (int x = 1; x < image.getWidth() - 1; x++) {
+                for (int y = 1; y < image.getHeight() - 1; y++) {
+                    if (image.getPixel(x, y) == 255) {
+                        int[][] pixels = new int[3][3];
+                        for (int x2 = 0; x2 < 3; x2++) {
+                            for (int y2 = 0; y2 < 3; y2++) {
+                                pixels[x2][y2] = image.getPixel(x + x2 - 1, y + y2 - 1);
                             }
-                            int v = Math.max(Math.min(calcula(pixels, z == 0), 255), 0);
-                            if (v != image.getPixel(x, y)) {
-                                mudou = true;
-                            }
-                            img.setPixel(x, y, v);
-//                        }
+                        }
+                        int v = Math.max(Math.min(calcula(pixels, firstStep), 255), 0);
+                        if (v != image.getPixel(x, y)) {
+                            mudou = true;
+                        }
+                        img.setPixel(x, y, v);
                     }
                 }
-                image = img;
             }
+            image = new Image(img);
         }
     }
 
