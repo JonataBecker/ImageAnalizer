@@ -24,9 +24,14 @@ public class DilationProcess extends MorphologyProcess {
                 maior = value;
             }
         }, x, y);
-        executeKernel((pixel, i, j) -> {
-           getImg().setPixel(x, y, maior);
-        }, x, y);
+        if (maior > 255) {
+            maior = 255;
+        }
+        if (maior > 10) {
+            executeKernel((pixel, i, j) -> {
+                getImg().setPixel(x, y, maior);
+            }, x, y);
+        }
     }
 
     private int[][] getKernel() {

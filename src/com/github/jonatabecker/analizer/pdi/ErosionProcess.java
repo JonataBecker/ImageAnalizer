@@ -24,8 +24,11 @@ public class ErosionProcess extends MorphologyProcess {
                 menor = value;
             }
         }, x, y);
+        if (menor == 10) {
+            menor = 0;
+        }
         executeKernel((pixel, i, j) -> {
-           getImg().setPixel(x, y, menor);
+            getImg().setPixel(x, y, menor);
         }, x, y);
     }
 
