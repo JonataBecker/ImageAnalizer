@@ -7,10 +7,11 @@ import com.github.jonatabecker.analizer.pdi.AverageProcess;
 import com.github.jonatabecker.analizer.pdi.DilationProcess;
 import com.github.jonatabecker.analizer.pdi.EnlargmentProcess;
 import com.github.jonatabecker.analizer.pdi.ErosionProcess;
-import com.github.jonatabecker.analizer.pdi.FechamentoProcess;
 import com.github.jonatabecker.analizer.pdi.FreeProcess;
 import com.github.jonatabecker.analizer.pdi.GaussProcess;
 import com.github.jonatabecker.analizer.pdi.AfinamentoProcess;
+import com.github.jonatabecker.analizer.pdi.CaracteristicaProcess;
+import com.github.jonatabecker.analizer.pdi.FechamentoProcess;
 import com.github.jonatabecker.analizer.pdi.MedianFilterProcess;
 import com.github.jonatabecker.analizer.pdi.MedianProcess;
 import com.github.jonatabecker.analizer.pdi.MirrorHorizonProcess;
@@ -70,6 +71,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Pair;
 
 /**
@@ -321,8 +323,15 @@ public class ImageAnalizer extends Application {
         });
         morfologia.getItems().addAll(morfologiaDilatacao, morfologiaErosao, morfologiaAbertura, morfologiaFechamento,
                 morfologiaAfinamento);
+        // Caracteristicas
+        Menu caracteristicas = new Menu("Caracteristicas");
+        MenuItem caracteristicasAnalise = new MenuItem("Análise");
+        caracteristicasAnalise.setOnAction((ActionEvent event) -> {
+            executeCaracteristica();
+        });
+        caracteristicas.getItems().add(caracteristicasAnalise);
         // Add menu itens
-        menuBar.getMenus().addAll(file, statistics, transformation, filtro, morfologia);
+        menuBar.getMenus().addAll(file, statistics, transformation, filtro, morfologia, caracteristicas);
         pane.setTop(menuBar);
     }
 
@@ -468,6 +477,25 @@ public class ImageAnalizer extends Application {
         dialog.show();
     }
 
+    private void executeCaracteristica() {
+        executeProcessImage(CaracteristicaProcess.class, new ThresholdProcess(new Image(reader), 150).execute());
+        CaracteristicaProcess pro = new CaracteristicaProcess(new ThresholdProcess(new Image(reader), 150).execute());
+        pro.execute();
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(10));
+        grid.setVgap(5);
+        grid.setHgap(8);        
+        pro.getDado().forEach((dado) -> {
+            int index = pro.getDado().indexOf(dado) + 1;
+            grid.addRow(index, new Rectangle(50, 50, Color.rgb(dado.getCor(),dado.getCor(),dado.getCor())), new Label(dado.getDado()));
+        });
+        Dialog<Double[]> dialog = new Dialog<>();
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+        dialog.setTitle("Caracteristicas");
+        dialog.getDialogPane().setContent(grid);
+        dialog.show();        
+    }
+    
     /**
      * Method responsible for creating the imagens boxes
      */
